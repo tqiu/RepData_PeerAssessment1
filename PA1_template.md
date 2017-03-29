@@ -1,4 +1,6 @@
 # Reproducible Research: Peer Assessment 1
+Tuoling Qiu  
+`r Sys.Date()`  
 
 
 ## Loading and preprocessing the data
@@ -23,23 +25,23 @@ activity$date <- as.Date(as.character(activity$date), "%Y-%m-%d")
 
 ```r
 ## Calculate total number of steps taken per day
-total_step <- with(activity, tapply(steps, date, sum))
+total_step <- with(activity, tapply(steps, date, sum, na.rm=T))
 
 ## Make a histogram of the total number of steps per day
 hist(total_step, breaks=10, main="Histogram of Total Number of Steps Per Day",
      xlab="Total Number of Steps Per Day")
 
 ## Calculate and report the mean and median 
-mean_step = mean(total_step, na.rm=T)
-median_step = median(total_step, na.rm=T)
+mean_step = mean(total_step)
+median_step = median(total_step)
 abline(v=median_step, col="red")
 abline(v=mean_step, col="purple")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
 
-- The mean of the total number of steps taken per day is 10766.19, indicated by the purple vertical line in the above histogram.
-- The median of the total number of steps taken per day is 10765, indicated by the red vertical line in the above histogram. Two lines seem to be overlapping since their difference is very small.
+- The mean of the total number of steps taken per day is 9354.23, indicated by the purple vertical line in the above histogram.
+- The median of the total number of steps taken per day is 10395, indicated by the red vertical line in the above histogram. 
 
 
 ## What is the average daily activity pattern?
@@ -119,13 +121,13 @@ abline(v=mean_step_new, col="purple")
 diff_mean <- mean_step_new - mean_step        
 diff_median <- median_step_new - median_step  
 ```
-- The difference of the mean value from the original dataset is 0, since I imputed all the missing data from the means.
-- The difference of the median value from the original dataset is 1.1886792.
+- The difference of the mean value from the original dataset is 1411.959171.
+- The difference of the median value from the original dataset is 371.1886792.
 
 - Impact of the imputing missing data on the estimates of the total daily number of steps:
-    + Because my strategy is to use the mean of the respective 5-minute interval across all days, the imputing procedure has no impact on the mean and slightly increases the median of total daily number of steps.
-    + This imputing strategy increases the frequency of the mean/median total daily number of steps according to the histogram.
-
+    + Since all the missing data are filled by the mean of the respective time interval, the values and frequencies of the mean/median total daily number of steps are increased (the 10000-12000 bin). 
+    + The frequencies for other daily number of steps are decreased, especially for the 0-2000 range.
+    
 
 ## Are there differences in activity patterns between weekdays and weekends?
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
@@ -151,3 +153,5 @@ print(plot)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+- You can see that during weekends, the maximum number of steps is decreased compared to that of weekdays. However, people tend to walk more in the middle or early afternoon of the day in weekends, as the middle peaks for the lower panel are higher than those of the upper panel.
