@@ -1,13 +1,9 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r}
+
+```r
 ## Check for whether the dataset exists, if not, download and unzip it.
 if (!file.exists("activity.csv")) {
     fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
@@ -20,11 +16,12 @@ activity <- read.csv("activity.csv")
 
 ## Change the date column from factor to date format
 activity$date <- as.Date(as.character(activity$date), "%Y-%m-%d")
-```    
+```
 
 
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 ## Calculate total number of steps taken per day
 total_step <- with(activity, tapply(steps, date, sum))
 
@@ -39,12 +36,15 @@ abline(v=median_step, col="red")
 abline(v=mean_step, col="purple")
 ```
 
-- The mean of the total number of steps taken per day is `r format(mean_step,2)`, indicated by the purple vertical line in the above histogram.
-- The median of the total number of steps taken per day is `r median_step`, indicated by the red vertical line in the above histogram. Two lines seem to be overlapping since their difference is very small.
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+- The mean of the total number of steps taken per day is 10766.19, indicated by the purple vertical line in the above histogram.
+- The median of the total number of steps taken per day is 10765, indicated by the red vertical line in the above histogram. Two lines seem to be overlapping since their difference is very small.
 
 
 ## What is the average daily activity pattern?
-```{r}
+
+```r
 ## Load packages for easy data manipulation and plotting
 suppressMessages(library(dplyr))
 library(ggplot2)
@@ -56,28 +56,34 @@ ave_step <- activity %>% group_by(interval) %>% summarise(mean(steps, na.rm=T))
 plot <- ggplot(ave_step, aes(ave_step[[1]], ave_step[[2]])) + geom_line() + 
     labs(x="5-minute interval", y="average number of steps", title="Average Daily Activity Pattern")
 print(plot)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 ## Find out which 5-minute interval contains the maximum number of steps
 max_interval <- ave_step[[1]][which.max(ave_step[[2]])]
 ```
 
 - The average daily activity pattern is shown in the above time series plot.
-- Interval ID `r max_interval`, on average across all the days in the dataset, contains the maximum number of steps.
+- Interval ID 835, on average across all the days in the dataset, contains the maximum number of steps.
 
 
 ## Imputing missing values
 1. Calculate and report the total number of missing values in the dataset.
-```{r}
+
+```r
 missing <- sum(is.na(activity))
 ```
-- The total number of missing values in the dataset is `r missing`.
+- The total number of missing values in the dataset is 2304.
 
 2. Strategy for filling in all of the missing values: 
 - I replaced all the missing values (NAs) with the mean of the number of steps taken for that 5-minute interval across all days, which was calculated and stored in "ave_step" object. 
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 - The code for creating a new dataset and filling in all the missing values is shown below:
-```{r}
+
+```r
 ## Store this filled new dataset in activity_new using the strategy described above.
 activity_new <- activity
 for (i in which(is.na(activity))) {
@@ -87,7 +93,8 @@ for (i in which(is.na(activity))) {
 ```
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
-```{r}
+
+```r
 ## Calculate total number of steps taken per day for new dataset
 total_step_new <- with(activity_new, tapply(steps, date, sum))
 
@@ -101,16 +108,19 @@ abline(v=median_step_new, col="red")
 abline(v=mean_step_new, col="purple")
 ```
 
-- The mean of the total number of steps taken per day is `r format(mean_step_new,2)`, indicated by the purple vertical line in the above histogram.
-- The median of the total number of steps taken per day is `r format(median_step_new, 2)`, indicated by the red vertical line in the above histogram. Two lines are overlapping since mean is equal to median.
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
-```{r}
+- The mean of the total number of steps taken per day is 10766.19, indicated by the purple vertical line in the above histogram.
+- The median of the total number of steps taken per day is 10766.19, indicated by the red vertical line in the above histogram. Two lines are overlapping since mean is equal to median.
+
+
+```r
 ## Do these values differ from those from original dataset?
 diff_mean <- mean_step_new - mean_step        
 diff_median <- median_step_new - median_step  
 ```
-- The difference of the mean value from the original dataset is `r diff_mean`, since I imputed all the missing data from the means.
-- The difference of the median value from the original dataset is `r diff_median`.
+- The difference of the mean value from the original dataset is 0, since I imputed all the missing data from the means.
+- The difference of the median value from the original dataset is 1.1886792.
 
 - Impact of the imputing missing data on the estimates of the total daily number of steps:
     + Because my strategy is to use the mean of the respective 5-minute interval across all days, the imputing procedure has no impact on the mean and slightly increases the median of total daily number of steps.
@@ -119,7 +129,8 @@ diff_median <- median_step_new - median_step
 
 ## Are there differences in activity patterns between weekdays and weekends?
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
-```{r}
+
+```r
 ## Create a new factor variable "weekday" with two levels - "weekday" and "weekend" for the new dataset
 activity_new$weekday <- weekdays(activity_new$date)
 activity_new$weekday <- gsub("Monday|Tuesday|Wednesday|Thursday|Friday", "Weekday", activity_new$weekday)
@@ -128,7 +139,8 @@ activity_new$weekday <- as.factor(activity_new$weekday)
 ```
 
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
-```{r}
+
+```r
 ## Calculate the average number of steps taken for each 5-minute interval across all weekdays and weekends
 ave_step_weekday <- activity_new %>% group_by(interval,weekday) %>% summarise(meanstep=mean(steps))
 
@@ -137,3 +149,5 @@ plot <- ggplot(ave_step_weekday, aes(interval, meanstep)) + geom_line() + facet_
     labs(x="5-minute interval", y="average number of steps", title="Activity Pattern for Weekdays and Weekends")
 print(plot)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
